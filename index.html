@@ -48,10 +48,9 @@
 
   <!-- Main App (hidden until login) -->
   <div id="main-app" class="hidden">
-    <!-- Top Bar (status only) -->
+    <!-- Top Bar -->
     <div class="top-bar">
-      <span class="nav-logo">🤫 PendejosUnite</span>
-      <div class="top-bar-right">
+      <div class="top-bar-left">
         <div class="online-status-container">
           <div id="user-status-indicator" class="status-dot online"></div>
           <span id="user-display-name" class="user-display-name">Jack</span>
@@ -61,17 +60,15 @@
           <span id="partner-name">Lucy</span>
           <span id="partner-status-text" class="status-text">offline</span>
         </div>
+      </div>
+      <div class="top-bar-right">
+        <button class="tab-icon active" data-tab="chat" onclick="switchTab('chat')" title="Chat">💬</button>
+        <button class="tab-icon" data-tab="media" onclick="switchTab('media')" title="Fotos">📸</button>
+        <button class="tab-icon" data-tab="pinboard" onclick="switchTab('pinboard')" title="Pins">📌</button>
         <button class="refresh-btn" onclick="location.reload()" title="Refrescar">🔄</button>
         <button class="logout-btn" onclick="logout()">Salir</button>
       </div>
     </div>
-
-    <!-- Bottom Tab Bar -->
-    <nav class="bottom-tabs">
-      <button class="nav-tab active" data-tab="chat" onclick="switchTab('chat')">💬<span>Chat</span></button>
-      <button class="nav-tab" data-tab="media" onclick="switchTab('media')">📸<span>Fotos</span></button>
-      <button class="nav-tab" data-tab="pinboard" onclick="switchTab('pinboard')">📌<span>Pins</span></button>
-    </nav>
 
     <!-- Chat Section -->
     <section id="chat-section" class="tab-content active">

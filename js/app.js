@@ -100,8 +100,8 @@ function updatePartnerDisplay() {
 
 // --- Tab Navigation ---
 function switchTab(tab) {
-  document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
-  document.querySelector(`.nav-tab[data-tab="${tab}"]`).classList.add("active");
+  document.querySelectorAll(".tab-icon").forEach(t => t.classList.remove("active"));
+  document.querySelector(`.tab-icon[data-tab="${tab}"]`).classList.add("active");
 
   document.querySelectorAll(".tab-content").forEach(s => {
     s.classList.remove("active");
@@ -864,8 +864,15 @@ async function uploadAndSendAudio(audioBlob) {
   }
 }
 
-// --- Notifications ---
+// --- Notifications & Service Worker ---
 function requestNotificationPermission() {
+  // Register service worker (required for notifications on iOS PWA)
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js").catch((err) => {
+      console.log("SW registration failed:", err);
+    });
+  }
+
   if ("Notification" in window && Notification.permission === "default") {
     Notification.requestPermission();
   }
@@ -885,16 +892,27 @@ function notifyNewMessage(msg) {
     body = msg.text;
   }
 
-  const notification = new Notification(`${msg.sender} en PendejosUnite`, {
-    body: body,
-    icon: "photos/foto3.png",
-    tag: "pendejosunite-msg"
-  });
-
-  notification.onclick = () => {
-    window.focus();
-    notification.close();
-  };
+  // Use service worker notification if available (works better on iOS PWA)
+  if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.ready.then((registration) => {
+      registration.showNotification(`${msg.sender} en PendejosUnite`, {
+        body: body,
+        icon: "photos/foto3.png",
+        tag: "pendejosunite-msg",
+        renotify: true
+      });
+    });
+  } else {
+    const notification = new Notification(`${msg.sender} en PendejosUnite`, {
+      body: body,
+      icon: "photos/foto3.png",
+      tag: "pendejosunite-msg"
+    });
+    notification.onclick = () => {
+      window.focus();
+      notification.close();
+    };
+  }
 }
 
 // --- Password input enter key ---
