@@ -31,6 +31,13 @@
       <h1 class="login-title">Zona Secreta</h1>
       <p class="login-subtitle">solo dos pendejos saben como entrar y una de la dos es muyyyy guapa</p>
       <div class="login-form">
+        <div class="login-name-picker">
+          <span class="login-name-label">Quien eres?</span>
+          <div class="login-name-btns">
+            <button class="name-btn active" data-name="Jack" onclick="pickLoginName('Jack')">Jack</button>
+            <button class="name-btn" data-name="Lucy" onclick="pickLoginName('Lucy')">Lucy</button>
+          </div>
+        </div>
         <input type="password" id="password-input" placeholder="Contraseña secreta..." autocomplete="off">
         <button id="login-btn" onclick="attemptLogin()">Entrar 🚪</button>
         <p id="login-error" class="login-error hidden">¡Esa no es, pendejo/a! 😜 Intenta otra vez.</p>
@@ -47,10 +54,7 @@
       <div class="top-bar-right">
         <div class="online-status-container">
           <div id="user-status-indicator" class="status-dot online"></div>
-          <select id="user-select" onchange="setCurrentUser()">
-            <option value="Jack">Jack</option>
-            <option value="Lucy">Lucy</option>
-          </select>
+          <span id="user-display-name" class="user-display-name">Jack</span>
         </div>
         <div class="partner-status">
           <div id="partner-status-dot" class="status-dot offline"></div>

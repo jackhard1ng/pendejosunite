@@ -63,9 +63,14 @@ function showApp() {
   document.getElementById("login-screen").classList.add("hidden");
   document.getElementById("main-app").classList.remove("hidden");
 
-  // Restore user selection
-  document.getElementById("user-select").value = currentUser;
+  // Show current user name in top bar
+  document.getElementById("user-display-name").textContent = currentUser;
   updatePartnerDisplay();
+
+  // Highlight the correct name button on login screen (for next time)
+  document.querySelectorAll(".name-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.name === currentUser);
+  });
 
   // Initialize everything
   initChat();
@@ -77,11 +82,12 @@ function showApp() {
 }
 
 // --- User Management ---
-function setCurrentUser() {
-  currentUser = document.getElementById("user-select").value;
+function pickLoginName(name) {
+  currentUser = name;
   localStorage.setItem(USER_KEY, currentUser);
-  updatePartnerDisplay();
-  updatePresence();
+  document.querySelectorAll(".name-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.dataset.name === name);
+  });
 }
 
 function getPartner() {

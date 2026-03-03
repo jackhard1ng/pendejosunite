@@ -213,6 +213,43 @@ body {
   gap: 14px;
 }
 
+.login-name-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.login-name-label {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.login-name-btns {
+  display: flex;
+  gap: 12px;
+}
+
+.name-btn {
+  padding: 10px 28px;
+  border-radius: 14px;
+  border: 2px solid rgba(0, 180, 216, 0.3);
+  background: var(--bg-input);
+  color: var(--text-muted);
+  font-family: 'Nunito', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.name-btn.active {
+  border-color: var(--primary);
+  background: rgba(0, 180, 216, 0.15);
+  color: var(--primary);
+  box-shadow: 0 0 12px rgba(0, 180, 216, 0.2);
+}
+
 .login-form input {
   padding: 14px 20px;
   border-radius: 14px;
@@ -365,16 +402,10 @@ body {
   background: #666;
 }
 
-#user-select {
-  padding: 4px 8px;
-  border-radius: 8px;
-  border: 1px solid rgba(0, 180, 216, 0.3);
-  background: var(--bg-input);
-  color: var(--text-light);
-  font-family: 'Nunito', sans-serif;
+.user-display-name {
   font-size: 0.85rem;
-  cursor: pointer;
-  outline: none;
+  font-weight: 700;
+  color: var(--primary);
 }
 
 .partner-status {
@@ -1253,9 +1284,8 @@ body {
     gap: 8px;
   }
 
-  #user-select {
+  .user-display-name {
     font-size: 0.8rem;
-    padding: 3px 6px;
   }
 
   .partner-status {
