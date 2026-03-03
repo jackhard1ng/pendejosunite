@@ -686,7 +686,7 @@ async function sendChatMedia() {
   if (!chatSelectedFile) return;
 
   const file = chatSelectedFile;
-  const fileName = `chat-media/${Date.now()}_${file.name}`;
+  const fileName = `media/${Date.now()}_${file.name}`;
   const storageRef = storage.ref(fileName);
 
   try {
@@ -804,7 +804,7 @@ function resetRecordingUI() {
 }
 
 async function uploadAndSendAudio(audioBlob) {
-  const fileName = `audio/${Date.now()}_${currentUser}.webm`;
+  const fileName = `media/${Date.now()}_${currentUser}.webm`;
   const storageRef = storage.ref(fileName);
 
   try {

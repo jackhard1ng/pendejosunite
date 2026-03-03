@@ -4,21 +4,10 @@ rules_version = '2';
 
 service firebase.storage {
   match /b/{bucket}/o {
-    // Media uploads
-    match /media/{fileName} {
-      allow read: if true;
-      allow write: if request.resource.size < 50 * 1024 * 1024; // Max 50MB
-    }
-
-    // Pinboard photo uploads
-    match /pins/{fileName} {
-      allow read: if true;
-      allow write: if request.resource.size < 50 * 1024 * 1024; // Max 50MB
-    }
-
-    // Deny everything else
+    // All uploads (media, audio, chat photos/videos, pins)
     match /{allPaths=**} {
-      allow read, write: if false;
+      allow read: if true;
+      allow write: if request.resource.size < 50 * 1024 * 1024; // Max 50MB
     }
   }
 }
