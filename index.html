@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔒 Nada que ver aquí...</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤫</text></svg>">
+</head>
+<body class="login-body">
+  <!-- Login Screen -->
+  <div id="login-screen" class="login-container">
+    <div class="login-card">
+      <div class="login-emoji">🤫</div>
+      <h1 class="login-title">Zona Secreta</h1>
+      <p class="login-subtitle">solo dos pendejos saben como entrar y una de la dos es muyyyy guapa</p>
+      <div class="login-form">
+        <input type="password" id="password-input" placeholder="Contraseña secreta..." autocomplete="off">
+        <button id="login-btn" onclick="attemptLogin()">Entrar 🚪</button>
+        <p id="login-error" class="login-error hidden">¡Esa no es, pendejo/a! 😜 Intenta otra vez.</p>
+      </div>
+      <div class="login-flags">
+        <span class="flag">🇨🇴</span>
+        <span class="flag-heart">❤️</span>
+        <span class="flag">🇺🇸</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main App (hidden until login) -->
+  <div id="main-app" class="hidden">
+    <!-- Top Navigation Bar -->
+    <nav class="top-nav">
+      <div class="nav-left">
+        <span class="nav-logo">🤫 PendejosUnite</span>
+      </div>
+      <div class="nav-center">
+        <button class="nav-tab active" data-tab="chat" onclick="switchTab('chat')">💬 Chat</button>
+        <button class="nav-tab" data-tab="media" onclick="switchTab('media')">📸 Fotos y Más</button>
+        <button class="nav-tab" data-tab="fun" onclick="switchTab('fun')">🎉 Fun Zone</button>
+      </div>
+      <div class="nav-right">
+        <div class="online-status-container">
+          <div id="user-status-indicator" class="status-dot online"></div>
+          <select id="user-select" onchange="setCurrentUser()">
+            <option value="Jack">Jack 🇺🇸</option>
+            <option value="Lucy">Lucy 🇨🇴</option>
+          </select>
+        </div>
+        <div class="partner-status">
+          <div id="partner-status-dot" class="status-dot offline"></div>
+          <span id="partner-name">Lucy</span>
+          <span id="partner-status-text" class="status-text">offline</span>
+        </div>
+        <button class="logout-btn" onclick="logout()">Salir 👋</button>
+      </div>
+    </nav>
+
+    <!-- Chat Section -->
+    <section id="chat-section" class="tab-content active">
+      <div class="chat-container">
+        <div id="chat-messages" class="chat-messages">
+          <!-- Messages will be inserted here -->
+        </div>
+        <div class="chat-input-area">
+          <div class="emoji-picker-container">
+            <button class="emoji-toggle" onclick="toggleEmojiPicker()">😊</button>
+            <div id="emoji-picker" class="emoji-picker hidden">
+              <div class="emoji-grid">
+                <!-- Emojis populated by JS -->
+              </div>
+            </div>
+          </div>
+          <input type="text" id="chat-input" placeholder="Escribe algo, pendejo/a... 😜" onkeypress="handleChatKeypress(event)">
+          <button class="send-btn" onclick="sendMessage()">Enviar 🚀</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Media Section -->
+    <section id="media-section" class="tab-content hidden">
+      <div class="media-container">
+        <div class="media-upload-area">
+          <h2>📤 Compartir algo</h2>
+          <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+            <p>📁 Click o arrastra archivos aquí</p>
+            <p class="upload-hint">Fotos, videos, audios... ¡lo que sea!</p>
+            <input type="file" id="file-input" accept="image/*,video/*,audio/*" multiple hidden onchange="handleFileSelect(event)">
+          </div>
+          <div id="upload-preview" class="upload-preview hidden">
+            <div id="preview-content"></div>
+            <input type="text" id="media-caption" placeholder="Escribe un caption... 📝">
+            <button class="upload-btn" onclick="uploadMedia()">Subir 🚀</button>
+            <button class="cancel-btn" onclick="cancelUpload()">Cancelar ❌</button>
+          </div>
+          <div id="upload-progress" class="upload-progress hidden">
+            <div class="progress-bar">
+              <div id="progress-fill" class="progress-fill"></div>
+            </div>
+            <span id="progress-text">Subiendo...</span>
+          </div>
+        </div>
+        <h2 class="media-feed-title">📸 Nuestras Memorias</h2>
+        <div id="media-feed" class="media-feed">
+          <!-- Media posts will be inserted here -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Fun Zone Section -->
+    <section id="fun-section" class="tab-content hidden">
+      <div class="fun-container">
+        <!-- Joke of the Day -->
+        <div class="fun-card">
+          <h2>😂 Chiste del Día / Joke of the Day</h2>
+          <div id="joke-display" class="joke-display">
+            <p id="joke-text">Loading...</p>
+            <button class="new-joke-btn" onclick="getNewJoke()">Otro chiste 🎲</button>
+          </div>
+        </div>
+
+        <!-- Language Tips -->
+        <div class="fun-card">
+          <h2>📚 Language Exchange Corner</h2>
+          <div class="language-tips">
+            <div class="tip-card spanish-tip">
+              <h3>🇨🇴 Lucy teaches Jack Spanish</h3>
+              <div id="spanish-tip" class="tip-content">
+                <p class="tip-word" id="spanish-word">Loading...</p>
+                <p class="tip-meaning" id="spanish-meaning"></p>
+              </div>
+              <button onclick="newSpanishTip()">Next tip 🔄</button>
+            </div>
+            <div class="tip-card english-tip">
+              <h3>🇺🇸 Jack teaches Lucy English</h3>
+              <div id="english-tip" class="tip-content">
+                <p class="tip-word" id="english-word">Loading...</p>
+                <p class="tip-meaning" id="english-meaning"></p>
+              </div>
+              <button onclick="newEnglishTip()">Next tip 🔄</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Quick Prompts -->
+        <div class="fun-card">
+          <h2>💡 Random Prompts para conversar</h2>
+          <div class="prompt-display">
+            <p id="conversation-prompt" class="conversation-prompt">Loading...</p>
+            <button onclick="newPrompt()">Otro prompt 🎰</button>
+          </div>
+        </div>
+
+        <!-- Photo Placeholder -->
+        <div class="fun-card photos-card">
+          <h2>📷 Nuestras Fotos</h2>
+          <div id="our-photos" class="our-photos-grid">
+            <div class="photo-placeholder">📷 Foto 1 coming soon...</div>
+            <div class="photo-placeholder">📷 Foto 2 coming soon...</div>
+            <div class="photo-placeholder">📷 Foto 3 coming soon...</div>
+            <div class="photo-placeholder">📷 Foto 4 coming soon...</div>
+          </div>
+          <p class="photos-note">Jack va a subir 4 fotos de nosotros aquí 🥰</p>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Firebase SDKs (loaded from CDN for GitHub Pages compatibility) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+  <script src="js/firebase-config.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
