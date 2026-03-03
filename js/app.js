@@ -873,8 +873,64 @@ function requestNotificationPermission() {
     });
   }
 
-  if ("Notification" in window && Notification.permission === "default") {
-    Notification.requestPermission();
+  updateNotifButton();
+}
+
+function enableNotifications() {
+  if (!("Notification" in window)) {
+    alert("Tu navegador no soporta notificaciones. Asegurate de tener iOS 16.4+ y la app instalada en la pantalla de inicio.");
+    return;
+  }
+
+  if (Notification.permission === "granted") {
+    alert("Las notificaciones ya estan activadas!");
+    return;
+  }
+
+  if (Notification.permission === "denied") {
+    alert("Las notificaciones estan bloqueadas. Ve a Ajustes > Notificaciones > PendejosUnite para activarlas.");
+    return;
+  }
+
+  Notification.requestPermission().then((permission) => {
+    updateNotifButton();
+    if (permission === "granted") {
+      // Send a test notification
+      if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+        navigator.serviceWorker.ready.then((reg) => {
+          reg.showNotification("PendejosUnite", {
+            body: "Notificaciones activadas!",
+            icon: "photos/foto3.png"
+          });
+        });
+      } else {
+        new Notification("PendejosUnite", {
+          body: "Notificaciones activadas!",
+          icon: "photos/foto3.png"
+        });
+      }
+    }
+  });
+}
+
+function updateNotifButton() {
+  const btn = document.getElementById("notif-btn");
+  if (!btn) return;
+
+  if (!("Notification" in window)) {
+    btn.style.display = "none";
+    return;
+  }
+
+  if (Notification.permission === "granted") {
+    btn.textContent = "🔔";
+    btn.classList.add("notif-on");
+  } else if (Notification.permission === "denied") {
+    btn.textContent = "🔕";
+    btn.classList.add("notif-off");
+  } else {
+    btn.textContent = "🔔";
+    btn.classList.remove("notif-on", "notif-off");
   }
 }
 
