@@ -73,6 +73,7 @@ function showApp() {
   initPresence();
   initPinboard();
   initDragDrop();
+  requestNotificationPermission();
 }
 
 // --- User Management ---
@@ -109,8 +110,11 @@ function switchTab(tab) {
 }
 
 // --- Real-time Chat ---
+let chatInitialized = false;
+
 function initChat() {
   if (unsubscribeChat) unsubscribeChat();
+  chatInitialized = false;
 
   const messagesDiv = document.getElementById("chat-messages");
 
@@ -118,6 +122,18 @@ function initChat() {
     .orderBy("timestamp", "asc")
     .limitToLast(200)
     .onSnapshot((snapshot) => {
+      // Check for new messages from partner (only after initial load)
+      if (chatInitialized) {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type === "added") {
+            const msg = change.doc.data();
+            if (msg.sender && msg.sender !== currentUser) {
+              notifyNewMessage(msg);
+            }
+          }
+        });
+      }
+
       messagesDiv.innerHTML = "";
 
       const welcome = document.createElement("div");
@@ -131,6 +147,7 @@ function initChat() {
       });
 
       scrollChatToBottom();
+      chatInitialized = true;
     }, (error) => {
       console.error("Chat error:", error);
       messagesDiv.innerHTML = '<div class="system-message">⚠️ Chat offline - check Firebase config</div>';
@@ -832,6 +849,39 @@ async function uploadAndSendAudio(audioBlob) {
     micBtn.disabled = false;
     micBtn.textContent = "🎙️";
   }
+}
+
+// --- Notifications ---
+function requestNotificationPermission() {
+  if ("Notification" in window && Notification.permission === "default") {
+    Notification.requestPermission();
+  }
+}
+
+function notifyNewMessage(msg) {
+  // Only notify when page is not visible (app in background)
+  if (document.visibilityState === "visible") return;
+  if (!("Notification" in window) || Notification.permission !== "granted") return;
+
+  let body = "Nuevo mensaje";
+  if (msg.audioUrl) {
+    body = "Te envio un audio 🎙️";
+  } else if (msg.mediaUrl) {
+    body = "Te envio una foto/video 📸";
+  } else if (msg.text) {
+    body = msg.text;
+  }
+
+  const notification = new Notification(`${msg.sender} en PendejosUnite`, {
+    body: body,
+    icon: "photos/foto3.png",
+    tag: "pendejosunite-msg"
+  });
+
+  notification.onclick = () => {
+    window.focus();
+    notification.close();
+  };
 }
 
 // --- Password input enter key ---
