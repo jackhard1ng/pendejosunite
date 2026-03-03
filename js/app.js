@@ -6,17 +6,10 @@
 const SECRET_PASSWORD = "marica";
 const SESSION_KEY = "pendejosunite_auth";
 const USER_KEY = "pendejosunite_user";
-const EMOJIS = [
-  "😂", "🤣", "❤️", "😍", "🥰", "😘", "😜", "🤪", "😎", "🥳",
-  "🎉", "🔥", "💯", "👏", "🙌", "💪", "🤝", "👋", "🫶", "🤗",
-  "🌮", "🍕", "☕", "🍺", "🎵", "💃", "🕺", "🌴", "🏖️", "✈️",
-  "📸", "💬", "🤫", "😈", "👀", "💀", "😤", "🫣", "🐶", "🐱",
-  "🌺", "🌻", "⭐", "🌙", "🎸", "📚", "💡", "🎯", "📌", "💖"
-];
-
 // --- State ---
 let currentUser = localStorage.getItem(USER_KEY) || "Jack";
 let selectedFiles = [];
+let chatSelectedFile = null;
 let pinSelectedFile = null;
 let unsubscribeChat = null;
 let unsubscribeMedia = null;
@@ -75,7 +68,6 @@ function showApp() {
   updatePartnerDisplay();
 
   // Initialize everything
-  initEmojiPicker();
   initChat();
   initMedia();
   initPresence();
@@ -115,37 +107,6 @@ function switchTab(tab) {
     scrollChatToBottom();
   }
 }
-
-// --- Emoji Picker ---
-function initEmojiPicker() {
-  const grid = document.querySelector(".emoji-grid");
-  grid.innerHTML = "";
-  EMOJIS.forEach(emoji => {
-    const span = document.createElement("span");
-    span.textContent = emoji;
-    span.onclick = () => insertEmoji(emoji);
-    grid.appendChild(span);
-  });
-}
-
-function toggleEmojiPicker() {
-  document.getElementById("emoji-picker").classList.toggle("hidden");
-}
-
-function insertEmoji(emoji) {
-  const input = document.getElementById("chat-input");
-  input.value += emoji;
-  input.focus();
-  document.getElementById("emoji-picker").classList.add("hidden");
-}
-
-document.addEventListener("click", (e) => {
-  const picker = document.getElementById("emoji-picker");
-  const toggle = document.querySelector(".emoji-toggle");
-  if (picker && !picker.contains(e.target) && !toggle.contains(e.target)) {
-    picker.classList.add("hidden");
-  }
-});
 
 // --- Real-time Chat ---
 function initChat() {
@@ -189,6 +150,12 @@ function renderMessage(msg, docId, container) {
   let contentHtml = "";
   if (msg.audioUrl) {
     contentHtml = `<div class="msg-audio"><audio src="${msg.audioUrl}" controls preload="metadata"></audio></div>`;
+  } else if (msg.mediaUrl) {
+    if (msg.mediaType === "video") {
+      contentHtml = `<div class="msg-media"><video src="${msg.mediaUrl}" controls preload="metadata"></video></div>`;
+    } else {
+      contentHtml = `<div class="msg-media"><img src="${msg.mediaUrl}" alt="" onclick="openLightbox('${msg.mediaUrl}')" loading="lazy"></div>`;
+    }
   } else {
     contentHtml = `<div class="msg-text">${escapeHtml(msg.text)}</div>`;
   }
@@ -681,6 +648,75 @@ async function deletePin(docId) {
   }
 }
 
+// --- Chat Media (photo/video in chat) ---
+function handleChatFileSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  chatSelectedFile = file;
+  const preview = document.getElementById("chat-file-preview");
+  const content = document.getElementById("chat-preview-content");
+  content.innerHTML = "";
+
+  if (file.type.startsWith("image/")) {
+    const img = document.createElement("img");
+    img.src = URL.createObjectURL(file);
+    content.appendChild(img);
+  } else if (file.type.startsWith("video/")) {
+    const video = document.createElement("video");
+    video.src = URL.createObjectURL(file);
+    video.muted = true;
+    content.appendChild(video);
+  }
+
+  preview.classList.remove("hidden");
+  document.getElementById("chat-input").classList.add("hidden");
+  document.querySelector(".chat-input-area > .send-btn").classList.add("hidden");
+}
+
+function cancelChatFile() {
+  chatSelectedFile = null;
+  document.getElementById("chat-file-preview").classList.add("hidden");
+  document.getElementById("chat-input").classList.remove("hidden");
+  document.querySelector(".chat-input-area > .send-btn").classList.remove("hidden");
+  document.getElementById("chat-file-input").value = "";
+}
+
+async function sendChatMedia() {
+  if (!chatSelectedFile) return;
+
+  const file = chatSelectedFile;
+  const fileName = `chat-media/${Date.now()}_${file.name}`;
+  const storageRef = storage.ref(fileName);
+
+  try {
+    const sendBtns = document.querySelectorAll(".chat-file-preview .send-btn");
+    sendBtns.forEach(b => { b.disabled = true; b.textContent = "..."; });
+
+    await storageRef.put(file);
+    const downloadURL = await storageRef.getDownloadURL();
+
+    const mediaType = file.type.startsWith("video/") ? "video" : "image";
+
+    await db.collection("messages").add({
+      sender: currentUser,
+      text: "",
+      mediaUrl: downloadURL,
+      mediaType: mediaType,
+      mediaFileName: fileName,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    cancelChatFile();
+    sendBtns.forEach(b => { b.disabled = false; b.textContent = "Enviar"; });
+  } catch (error) {
+    console.error("Chat media upload error:", error);
+    alert("Error subiendo el archivo. Intenta de nuevo.");
+    const sendBtns = document.querySelectorAll(".chat-file-preview .send-btn");
+    sendBtns.forEach(b => { b.disabled = false; b.textContent = "Enviar"; });
+  }
+}
+
 // --- Audio Recording ---
 async function toggleRecording() {
   if (isRecording) {
@@ -717,8 +753,8 @@ async function startRecording() {
     micBtn.classList.add("recording");
     document.getElementById("recording-indicator").classList.remove("hidden");
     document.getElementById("chat-input").classList.add("hidden");
-    document.querySelector(".send-btn").classList.add("hidden");
-    document.querySelector(".emoji-picker-container").classList.add("hidden");
+    document.querySelector(".chat-input-area > .send-btn").classList.add("hidden");
+    document.querySelector(".chat-media-btns .chat-attach-btn").classList.add("hidden");
 
     recordingTimer = setInterval(() => {
       recordingSeconds++;
@@ -762,8 +798,8 @@ function resetRecordingUI() {
   micBtn.classList.remove("recording");
   document.getElementById("recording-indicator").classList.add("hidden");
   document.getElementById("chat-input").classList.remove("hidden");
-  document.querySelector(".send-btn").classList.remove("hidden");
-  document.querySelector(".emoji-picker-container").classList.remove("hidden");
+  document.querySelector(".chat-input-area > .send-btn").classList.remove("hidden");
+  document.querySelector(".chat-media-btns .chat-attach-btn").classList.remove("hidden");
   document.getElementById("rec-timer").textContent = "0:00";
 }
 

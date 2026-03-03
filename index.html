@@ -19,7 +19,7 @@
   <!-- Login Screen -->
   <div id="login-screen" class="login-container">
     <div class="login-card">
-      <div class="login-emoji">🤫</div>
+      <img src="photos/foto3.png" alt="Welcome" class="login-welcome-img">
       <h1 class="login-title">Zona Secreta</h1>
       <p class="login-subtitle">solo dos pendejos saben como entrar y una de la dos es muyyyy guapa</p>
       <div class="login-form">
@@ -66,21 +66,22 @@
           <!-- Messages will be inserted here -->
         </div>
         <div class="chat-input-area">
-          <div class="emoji-picker-container">
-            <button class="emoji-toggle" onclick="toggleEmojiPicker()">😊</button>
-            <div id="emoji-picker" class="emoji-picker hidden">
-              <div class="emoji-grid">
-                <!-- Emojis populated by JS -->
-              </div>
-            </div>
+          <div class="chat-media-btns">
+            <button class="chat-attach-btn" onclick="document.getElementById('chat-file-input').click()" title="Enviar foto o video">📷</button>
+            <input type="file" id="chat-file-input" accept="image/*,video/*" hidden onchange="handleChatFileSelect(event)">
+            <button class="mic-btn" id="mic-btn" onclick="toggleRecording()" title="Grabar audio">🎙️</button>
           </div>
-          <input type="text" id="chat-input" placeholder="Escribe algo, pendejo/a... 😜" onkeypress="handleChatKeypress(event)">
-          <button class="send-btn" onclick="sendMessage()">Enviar 🚀</button>
-          <button class="mic-btn" id="mic-btn" onclick="toggleRecording()">🎙️</button>
+          <input type="text" id="chat-input" placeholder="Escribe algo..." onkeypress="handleChatKeypress(event)">
+          <button class="send-btn" onclick="sendMessage()">Enviar</button>
           <div id="recording-indicator" class="recording-indicator hidden">
             <div class="rec-dot"></div>
             <span id="rec-timer">0:00</span>
             <button class="rec-cancel" onclick="cancelRecording()">✕</button>
+          </div>
+          <div id="chat-file-preview" class="chat-file-preview hidden">
+            <div id="chat-preview-content"></div>
+            <button class="send-btn" onclick="sendChatMedia()">Enviar</button>
+            <button class="rec-cancel" onclick="cancelChatFile()">✕</button>
           </div>
         </div>
       </div>
