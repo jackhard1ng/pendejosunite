@@ -128,32 +128,38 @@ function initChat() {
     .orderBy("timestamp", "asc")
     .limitToLast(200)
     .onSnapshot((snapshot) => {
-      // Check for new messages from partner (only after initial load)
-      if (chatInitialized) {
+      if (!chatInitialized) {
+        // First load: render everything
+        messagesDiv.innerHTML = "";
+
+        const welcome = document.createElement("div");
+        welcome.className = "system-message";
+        welcome.textContent = "🤫 Bienvenidos a PendejosUnite - nuestro secreto";
+        messagesDiv.appendChild(welcome);
+
+        snapshot.forEach((doc) => {
+          const msg = doc.data();
+          renderMessage(msg, doc.id, messagesDiv);
+        });
+
+        chatInitialized = true;
+      } else {
+        // After initial load: only handle changes (no full re-render)
         snapshot.docChanges().forEach((change) => {
           if (change.type === "added") {
             const msg = change.doc.data();
+            renderMessage(msg, change.doc.id, messagesDiv);
             if (msg.sender && msg.sender !== currentUser) {
               notifyNewMessage(msg);
             }
+          } else if (change.type === "removed") {
+            const el = document.getElementById(`msg-${change.doc.id}`);
+            if (el) el.remove();
           }
         });
       }
 
-      messagesDiv.innerHTML = "";
-
-      const welcome = document.createElement("div");
-      welcome.className = "system-message";
-      welcome.textContent = "🤫 Bienvenidos a PendejosUnite - nuestro secreto";
-      messagesDiv.appendChild(welcome);
-
-      snapshot.forEach((doc) => {
-        const msg = doc.data();
-        renderMessage(msg, doc.id, messagesDiv);
-      });
-
       scrollChatToBottom();
-      chatInitialized = true;
     }, (error) => {
       console.error("Chat error:", error);
       messagesDiv.innerHTML = '<div class="system-message">⚠️ Chat offline - check Firebase config</div>';
@@ -162,6 +168,7 @@ function initChat() {
 
 function renderMessage(msg, docId, container) {
   const div = document.createElement("div");
+  div.id = `msg-${docId}`;
   const senderClass = msg.sender === "Jack" ? "jack" : "lucy";
   div.className = `message ${senderClass}`;
 
