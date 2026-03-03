@@ -30,7 +30,7 @@ function attemptLogin() {
   const error = document.getElementById("login-error");
 
   if (input.value === SECRET_PASSWORD) {
-    sessionStorage.setItem(SESSION_KEY, "true");
+    localStorage.setItem(SESSION_KEY, "true");
     error.classList.add("hidden");
     showApp();
   } else {
@@ -44,13 +44,13 @@ function attemptLogin() {
 }
 
 function checkAuth() {
-  if (sessionStorage.getItem(SESSION_KEY) === "true") {
+  if (localStorage.getItem(SESSION_KEY) === "true") {
     showApp();
   }
 }
 
 function logout() {
-  sessionStorage.removeItem(SESSION_KEY);
+  localStorage.removeItem(SESSION_KEY);
   setOffline();
   if (unsubscribeChat) unsubscribeChat();
   if (unsubscribeMedia) unsubscribeMedia();
