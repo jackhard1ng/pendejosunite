@@ -77,6 +77,14 @@
         <div id="chat-messages" class="chat-messages">
           <!-- Messages will be inserted here -->
         </div>
+        <div id="reply-bar" class="reply-bar hidden">
+          <div class="reply-bar-content">
+            <span class="reply-bar-label">Respondiendo a </span>
+            <span class="reply-bar-name" id="reply-bar-name"></span>
+            <span class="reply-bar-text" id="reply-bar-text"></span>
+          </div>
+          <button class="reply-bar-close" onclick="cancelReply()">✕</button>
+        </div>
         <div class="chat-input-area">
           <div class="chat-media-btns">
             <button class="chat-attach-btn" onclick="document.getElementById('chat-file-input').click()" title="Enviar foto o video">📷</button>

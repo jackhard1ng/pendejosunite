@@ -21,6 +21,7 @@ let audioChunks = [];
 let isRecording = false;
 let recordingTimer = null;
 let recordingSeconds = 0;
+let replyingTo = null; // { docId, sender, text }
 
 // --- Authentication ---
 function attemptLogin() {
@@ -78,6 +79,7 @@ function showApp() {
   initPresence();
   initPinboard();
   initDragDrop();
+  initSwipeReply();
   requestNotificationPermission();
 }
 
@@ -177,6 +179,20 @@ function renderMessage(msg, docId, container) {
     minute: "2-digit"
   }) : "...";
 
+  // Reply quote
+  let replyHtml = "";
+  if (msg.replyTo) {
+    const replyText = msg.replyTo.text || (msg.replyTo.audioUrl ? "🎙️ Audio" : "📸 Foto/Video");
+    const displayText = replyText.length > 80 ? replyText.substring(0, 80) + "..." : replyText;
+    const replyClass = msg.replyTo.sender === "Jack" ? "reply-jack" : "reply-lucy";
+    replyHtml = `
+      <div class="msg-reply-quote ${replyClass}" onclick="scrollToMessage('${msg.replyTo.docId}')">
+        <span class="reply-quote-sender">${escapeHtml(msg.replyTo.sender)}</span>
+        <span class="reply-quote-text">${escapeHtml(displayText)}</span>
+      </div>
+    `;
+  }
+
   let contentHtml = "";
   if (msg.audioUrl) {
     contentHtml = `<div class="msg-audio"><audio src="${msg.audioUrl}" controls preload="metadata"></audio></div>`;
@@ -190,10 +206,18 @@ function renderMessage(msg, docId, container) {
     contentHtml = `<div class="msg-text">${escapeHtml(msg.text)}</div>`;
   }
 
+  // Build a summary for reply purposes
+  let replySummary = msg.text || "";
+  if (msg.audioUrl) replySummary = "🎙️ Audio";
+  if (msg.mediaUrl) replySummary = "📸 Foto/Video";
+  const replyData = escapeHtml(JSON.stringify({ docId, sender: msg.sender, text: replySummary }));
+
   div.innerHTML = `
     <div class="msg-sender">${escapeHtml(msg.sender)}</div>
+    ${replyHtml}
     ${contentHtml}
     <div class="msg-bottom">
+      <button class="reply-btn" onclick='startReply(${replyData})' title="Responder">↩️</button>
       <button class="pin-btn" onclick="pinMessage('${docId}')" title="Pin this message">📌</button>
       <span class="msg-time">${time}</span>
     </div>
@@ -202,18 +226,110 @@ function renderMessage(msg, docId, container) {
   container.appendChild(div);
 }
 
+function scrollToMessage(docId) {
+  const el = document.getElementById(`msg-${docId}`);
+  if (!el) return;
+  el.scrollIntoView({ behavior: "smooth", block: "center" });
+  el.classList.add("msg-highlight");
+  setTimeout(() => el.classList.remove("msg-highlight"), 1500);
+}
+
+function startReply(data) {
+  replyingTo = data;
+  const bar = document.getElementById("reply-bar");
+  const name = document.getElementById("reply-bar-name");
+  const text = document.getElementById("reply-bar-text");
+
+  name.textContent = data.sender;
+  const displayText = data.text.length > 60 ? data.text.substring(0, 60) + "..." : data.text;
+  text.textContent = displayText;
+  bar.classList.remove("hidden");
+
+  document.getElementById("chat-input").focus();
+}
+
+function cancelReply() {
+  replyingTo = null;
+  document.getElementById("reply-bar").classList.add("hidden");
+}
+
+// --- Swipe to reply (mobile gesture) ---
+function initSwipeReply() {
+  const messagesDiv = document.getElementById("chat-messages");
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let swipingEl = null;
+  let swiping = false;
+
+  messagesDiv.addEventListener("touchstart", (e) => {
+    const msgEl = e.target.closest(".message");
+    if (!msgEl) return;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    swipingEl = msgEl;
+    swiping = false;
+  }, { passive: true });
+
+  messagesDiv.addEventListener("touchmove", (e) => {
+    if (!swipingEl) return;
+    const dx = e.touches[0].clientX - touchStartX;
+    const dy = Math.abs(e.touches[0].clientY - touchStartY);
+
+    // Only horizontal swipe (right), ignore vertical scrolling
+    if (dy > 30 && !swiping) {
+      swipingEl = null;
+      return;
+    }
+
+    if (dx > 15) {
+      swiping = true;
+      const offset = Math.min(dx - 15, 80);
+      swipingEl.style.transform = `translateX(${offset}px)`;
+      swipingEl.style.transition = "none";
+    }
+  }, { passive: true });
+
+  messagesDiv.addEventListener("touchend", (e) => {
+    if (!swipingEl) return;
+    const dx = e.changedTouches[0].clientX - touchStartX;
+
+    swipingEl.style.transition = "transform 0.2s ease-out";
+    swipingEl.style.transform = "";
+
+    // Trigger reply if swiped far enough
+    if (swiping && dx > 60) {
+      const replyBtn = swipingEl.querySelector(".reply-btn");
+      if (replyBtn) replyBtn.click();
+    }
+
+    swipingEl = null;
+    swiping = false;
+  }, { passive: true });
+}
+
 function sendMessage() {
   const input = document.getElementById("chat-input");
   const text = input.value.trim();
   if (!text) return;
 
-  db.collection("messages").add({
+  const msgData = {
     sender: currentUser,
     text: text,
     timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  }).then(() => {
+  };
+
+  if (replyingTo) {
+    msgData.replyTo = {
+      docId: replyingTo.docId,
+      sender: replyingTo.sender,
+      text: replyingTo.text
+    };
+  }
+
+  db.collection("messages").add(msgData).then(() => {
     input.value = "";
     input.focus();
+    cancelReply();
   }).catch((error) => {
     console.error("Error sending message:", error);
     alert("Error sending message. Check Firebase config!");
@@ -728,16 +844,27 @@ async function sendChatMedia() {
 
     const mediaType = file.type.startsWith("video/") ? "video" : "image";
 
-    await db.collection("messages").add({
+    const mediaMsg = {
       sender: currentUser,
       text: "",
       mediaUrl: downloadURL,
       mediaType: mediaType,
       mediaFileName: fileName,
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    };
+
+    if (replyingTo) {
+      mediaMsg.replyTo = {
+        docId: replyingTo.docId,
+        sender: replyingTo.sender,
+        text: replyingTo.text
+      };
+    }
+
+    await db.collection("messages").add(mediaMsg);
 
     cancelChatFile();
+    cancelReply();
     sendBtns.forEach(b => { b.disabled = false; b.textContent = "Enviar"; });
   } catch (error) {
     console.error("Chat media upload error:", error);
@@ -845,13 +972,24 @@ async function uploadAndSendAudio(audioBlob) {
     await storageRef.put(audioBlob);
     const downloadURL = await storageRef.getDownloadURL();
 
-    await db.collection("messages").add({
+    const audioMsg = {
       sender: currentUser,
       text: "",
       audioUrl: downloadURL,
       audioFileName: fileName,
       timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    });
+    };
+
+    if (replyingTo) {
+      audioMsg.replyTo = {
+        docId: replyingTo.docId,
+        sender: replyingTo.sender,
+        text: replyingTo.text
+      };
+    }
+
+    await db.collection("messages").add(audioMsg);
+    cancelReply();
 
     micBtn.disabled = false;
     micBtn.textContent = "🎙️";
@@ -935,39 +1073,38 @@ function updateNotifButton() {
 }
 
 function notifyNewMessage(msg) {
-  // Only notify when page is not visible (app in background)
+  // Only notify when page is not visible (app in background / switched away)
   if (document.visibilityState === "visible") return;
   if (!("Notification" in window) || Notification.permission !== "granted") return;
 
   let body = "Nuevo mensaje";
   if (msg.audioUrl) {
-    body = "Te envio un audio 🎙️";
+    body = "🎙️ Audio";
   } else if (msg.mediaUrl) {
-    body = "Te envio una foto/video 📸";
+    body = "📸 Foto/Video";
   } else if (msg.text) {
-    body = msg.text;
+    body = msg.text.length > 100 ? msg.text.substring(0, 100) + "..." : msg.text;
   }
 
-  // Use service worker notification if available (works better on iOS PWA)
-  if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+  const title = `${msg.sender} en PendejosUnite`;
+  const options = {
+    body: body,
+    icon: "photos/foto3.png",
+    badge: "photos/foto3.png",
+    tag: "pendejosunite-msg-" + Date.now(),
+    vibrate: [200, 100, 200]
+  };
+
+  // Always use service worker registration (works on iOS PWA even when controller is null)
+  if ("serviceWorker" in navigator) {
     navigator.serviceWorker.ready.then((registration) => {
-      registration.showNotification(`${msg.sender} en PendejosUnite`, {
-        body: body,
-        icon: "photos/foto3.png",
-        tag: "pendejosunite-msg",
-        renotify: true
-      });
+      registration.showNotification(title, options);
+    }).catch(() => {
+      // Fallback to basic Notification API
+      try { new Notification(title, options); } catch (e) {}
     });
   } else {
-    const notification = new Notification(`${msg.sender} en PendejosUnite`, {
-      body: body,
-      icon: "photos/foto3.png",
-      tag: "pendejosunite-msg"
-    });
-    notification.onclick = () => {
-      window.focus();
-      notification.close();
-    };
+    try { new Notification(title, options); } catch (e) {}
   }
 }
 

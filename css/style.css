@@ -560,6 +560,139 @@ body {
   background: rgba(255, 255, 255, 0.15);
 }
 
+/* Reply bar above input */
+.reply-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: rgba(22, 33, 62, 0.98);
+  border-top: 1px solid rgba(0, 180, 216, 0.15);
+  border-left: 3px solid var(--primary);
+  flex-shrink: 0;
+  animation: slideUp 0.2s ease-out;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.reply-bar-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1;
+}
+
+.reply-bar-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.reply-bar-name {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.reply-bar-text {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.reply-bar-close {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(239, 71, 111, 0.2);
+  color: var(--danger);
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-left: 10px;
+}
+
+.reply-bar-close:hover {
+  background: rgba(239, 71, 111, 0.4);
+}
+
+/* Reply quote inside message bubble */
+.msg-reply-quote {
+  padding: 6px 10px;
+  border-radius: 8px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  border-left: 3px solid;
+  transition: background 0.2s;
+}
+
+.msg-reply-quote.reply-jack {
+  background: rgba(0, 119, 182, 0.25);
+  border-left-color: rgba(0, 180, 216, 0.7);
+}
+
+.msg-reply-quote.reply-lucy {
+  background: rgba(6, 214, 160, 0.2);
+  border-left-color: rgba(6, 214, 160, 0.7);
+}
+
+.msg-reply-quote:active {
+  opacity: 0.7;
+}
+
+.reply-quote-sender {
+  display: block;
+  font-size: 0.7rem;
+  font-weight: 700;
+  opacity: 0.9;
+}
+
+.reply-quote-text {
+  display: block;
+  font-size: 0.75rem;
+  opacity: 0.75;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200px;
+}
+
+/* Reply button on messages */
+.message .reply-btn {
+  font-size: 0.7rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 0.4;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.message .reply-btn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Highlight animation when scrolling to a replied message */
+.msg-highlight {
+  animation: highlightMsg 1.5s ease-out;
+}
+
+@keyframes highlightMsg {
+  0% { box-shadow: 0 0 0 3px rgba(255, 209, 102, 0.8); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 209, 102, 0); }
+}
+
 .chat-input-area {
   display: flex;
   align-items: center;
