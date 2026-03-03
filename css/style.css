@@ -144,7 +144,7 @@ body {
   height: 100%;
   background-size: cover;
   background-position: center;
-  opacity: 0.15;
+  opacity: 0.25;
 }
 
 .login-card-content {
@@ -152,9 +152,9 @@ body {
   z-index: 1;
   padding: 50px 40px;
   text-align: center;
-  background: rgba(22, 33, 62, 0.85);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: rgba(22, 33, 62, 0.75);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 @keyframes fadeInUp {
@@ -179,10 +179,14 @@ body {
   75% { transform: translateX(10px); }
 }
 
-.login-emoji {
-  font-size: 64px;
-  margin-bottom: 16px;
-  animation: pulse 2s infinite;
+.login-avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-bottom: 14px;
+  border: 2px solid rgba(0, 180, 216, 0.5);
+  box-shadow: 0 0 15px rgba(0, 180, 216, 0.3);
 }
 
 .login-title {
@@ -405,6 +409,7 @@ body {
   display: flex;
   flex-direction: column;
   height: calc(100vh - 70px);
+  height: calc(100dvh - 70px);
 }
 
 .chat-messages {
@@ -497,9 +502,11 @@ body {
   align-items: center;
   gap: 10px;
   padding: 16px 20px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   background: rgba(22, 33, 62, 0.95);
   backdrop-filter: blur(10px);
   border-top: 1px solid rgba(0, 180, 216, 0.15);
+  flex-shrink: 0;
 }
 
 .chat-media-btns {
@@ -1231,6 +1238,7 @@ body {
 
   .chat-container {
     height: calc(100vh - 130px);
+    height: calc(100dvh - 130px);
   }
 
   .message {
@@ -1239,7 +1247,13 @@ body {
 
   .chat-input-area {
     padding: 10px 12px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom, 0px));
     gap: 6px;
+  }
+
+  .login-avatar {
+    width: 55px;
+    height: 55px;
   }
 
   #chat-input {
