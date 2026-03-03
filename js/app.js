@@ -8,85 +8,20 @@ const SESSION_KEY = "pendejosunite_auth";
 const USER_KEY = "pendejosunite_user";
 const EMOJIS = [
   "😂", "🤣", "❤️", "😍", "🥰", "😘", "😜", "🤪", "😎", "🥳",
-  "🎉", "🔥", "💯", "👏", "🙌", "💪", "🤝", "👋", "🇨🇴", "🇺🇸",
+  "🎉", "🔥", "💯", "👏", "🙌", "💪", "🤝", "👋", "🫶", "🤗",
   "🌮", "🍕", "☕", "🍺", "🎵", "💃", "🕺", "🌴", "🏖️", "✈️",
-  "📸", "💬", "🤫", "😈", "👀", "💀", "🫶", "🤗", "😤", "🫣",
-  "🐶", "🐱", "🌺", "🌻", "⭐", "🌙", "🎸", "📚", "💡", "🎯"
-];
-
-const JOKES = [
-  "¿Por qué los colombianos son tan buenos en matemáticas? ¡Porque siempre saben sumar parceros! 🇨🇴😂",
-  "Why did the American bring a ladder to the bar? Because the drinks were on the house! 🇺🇸🍺",
-  "¿Qué le dijo un pendejo al otro? ¡Nada, porque los dos estaban pensando lo mismo! 😜",
-  "How does a gringo say goodbye in Colombia? ¡Chao pescao! 🐟👋",
-  "¿Por qué Jack no puede hablar español rápido? Porque se le enreda la lengua con los ñ's 😂",
-  "Why did Lucy switch to English? Because Jack's Spanish was giving her a headache! 🤕😂",
-  "¿Qué es un pendejo bilingüe? Alguien que dice tonterías en dos idiomas 🤣🌎",
-  "Jack tried to say 'I'm embarrassed' in Spanish and said 'Estoy embarazado'... Lucy hasn't stopped laughing 😂😂",
-  "¿Cuál es la diferencia entre un parcero y un bro? ¡El acento! 🇨🇴🇺🇸",
-  "Why don't secrets last between pendejos? Because they always end up on a secret website! 🤫💻"
-];
-
-const SPANISH_TIPS = [
-  { word: "¡Qué chimba!", meaning: "That's awesome! (Colombian slang)" },
-  { word: "Parcero/a", meaning: "Buddy, close friend (Colombian)" },
-  { word: "¿Qué más?", meaning: "What's up? (Colombian greeting)" },
-  { word: "Bacano", meaning: "Cool, nice (Colombian)" },
-  { word: "Marica", meaning: "Dude/bro (Colombian slang, between friends)" },
-  { word: "Rumbear", meaning: "To party (Colombian)" },
-  { word: "Berraco/a", meaning: "Awesome, tough, hardworking" },
-  { word: "Tenaz", meaning: "Tough/intense (Colombian)" },
-  { word: "¡De una!", meaning: "Let's do it! / Right away!" },
-  { word: "Parche", meaning: "Hangout group / vibe" },
-  { word: "Tinto", meaning: "Black coffee (Colombian)" },
-  { word: "Chévere", meaning: "Cool, awesome" },
-  { word: "¡No joda!", meaning: "No way! / Come on!" },
-  { word: "Gonorrea", meaning: "Expression of surprise (very informal!)" },
-  { word: "Te quiero mucho", meaning: "I care about you a lot ❤️" }
-];
-
-const ENGLISH_TIPS = [
-  { word: "No cap", meaning: "No mentira / En serio (slang)" },
-  { word: "Lowkey", meaning: "Un poquito / Secretamente" },
-  { word: "Vibe check", meaning: "Revisar la energía/onda" },
-  { word: "Slay", meaning: "¡Lo hiciste increíble!" },
-  { word: "It's giving...", meaning: "Parece como... / Tiene vibra de..." },
-  { word: "Bet", meaning: "¡Dale! / OK (agreement)" },
-  { word: "Sus", meaning: "Sospechoso (from 'suspicious')" },
-  { word: "GOAT", meaning: "Greatest Of All Time = El/la mejor" },
-  { word: "Ghosting", meaning: "Dejar de contestar mensajes 👻" },
-  { word: "Chill", meaning: "Relajado/a, tranqui" },
-  { word: "Salty", meaning: "Molesto/a, resentido/a" },
-  { word: "Flex", meaning: "Presumir / Mostrar algo cool" },
-  { word: "Wholesome", meaning: "Tierno, bonito, que da ternura" },
-  { word: "I appreciate you", meaning: "Te valoro mucho ❤️" }
-];
-
-const PROMPTS = [
-  "🎵 Si tu vida fuera una canción, ¿cuál sería y por qué?",
-  "🌍 If you could teleport anywhere RIGHT NOW, where would you go?",
-  "😂 ¿Cuál es el momento más vergonzoso que has vivido?",
-  "🍽️ You can only eat ONE food for the rest of your life. What is it?",
-  "🤔 ¿Qué es algo que nunca le has dicho a nadie?",
-  "✈️ Dream trip together: where are we going and what are we doing?",
-  "📱 Show the last meme you saved on your phone!",
-  "🎬 ¿Cuál es tu película favorita y por qué?",
-  "💡 What's a skill you wish you had?",
-  "🌅 Describe tu día perfecto en Bogotá para Jack",
-  "🗽 Describe your perfect day in the US for Lucy",
-  "🤫 Tell me a secret... (it stays on this site!)",
-  "📚 Teach me a phrase in your language right now!",
-  "🎵 Send the link to a song that reminds you of us!",
-  "💭 ¿En qué estás pensando ahorita?"
+  "📸", "💬", "🤫", "😈", "👀", "💀", "😤", "🫣", "🐶", "🐱",
+  "🌺", "🌻", "⭐", "🌙", "🎸", "📚", "💡", "🎯", "📌", "💖"
 ];
 
 // --- State ---
 let currentUser = localStorage.getItem(USER_KEY) || "Jack";
 let selectedFiles = [];
-let typingTimeout = null;
+let pinSelectedFile = null;
 let unsubscribeChat = null;
 let unsubscribeMedia = null;
 let unsubscribePresence = null;
+let unsubscribePins = null;
 let presenceInterval = null;
 
 // --- Authentication ---
@@ -102,9 +37,8 @@ function attemptLogin() {
     error.classList.remove("hidden");
     input.value = "";
     input.focus();
-    // Shake animation
     error.style.animation = "none";
-    error.offsetHeight; // trigger reflow
+    error.offsetHeight;
     error.style.animation = "shake 0.5s ease-in-out";
   }
 }
@@ -121,6 +55,7 @@ function logout() {
   if (unsubscribeChat) unsubscribeChat();
   if (unsubscribeMedia) unsubscribeMedia();
   if (unsubscribePresence) unsubscribePresence();
+  if (unsubscribePins) unsubscribePins();
   if (presenceInterval) clearInterval(presenceInterval);
   document.getElementById("login-screen").classList.remove("hidden");
   document.getElementById("main-app").classList.add("hidden");
@@ -139,7 +74,7 @@ function showApp() {
   initChat();
   initMedia();
   initPresence();
-  initFunZone();
+  initPinboard();
   initDragDrop();
 }
 
@@ -161,11 +96,9 @@ function updatePartnerDisplay() {
 
 // --- Tab Navigation ---
 function switchTab(tab) {
-  // Update tab buttons
   document.querySelectorAll(".nav-tab").forEach(t => t.classList.remove("active"));
   document.querySelector(`.nav-tab[data-tab="${tab}"]`).classList.add("active");
 
-  // Update tab content
   document.querySelectorAll(".tab-content").forEach(s => {
     s.classList.remove("active");
     s.classList.add("hidden");
@@ -173,7 +106,6 @@ function switchTab(tab) {
   document.getElementById(`${tab}-section`).classList.remove("hidden");
   document.getElementById(`${tab}-section`).classList.add("active");
 
-  // Scroll chat to bottom when switching to chat
   if (tab === "chat") {
     scrollChatToBottom();
   }
@@ -202,7 +134,6 @@ function insertEmoji(emoji) {
   document.getElementById("emoji-picker").classList.add("hidden");
 }
 
-// Close emoji picker when clicking outside
 document.addEventListener("click", (e) => {
   const picker = document.getElementById("emoji-picker");
   const toggle = document.querySelector(".emoji-toggle");
@@ -217,33 +148,30 @@ function initChat() {
 
   const messagesDiv = document.getElementById("chat-messages");
 
-  // Listen for messages in real-time
   unsubscribeChat = db.collection("messages")
     .orderBy("timestamp", "asc")
     .limitToLast(200)
     .onSnapshot((snapshot) => {
       messagesDiv.innerHTML = "";
 
-      // Add welcome system message
       const welcome = document.createElement("div");
       welcome.className = "system-message";
-      welcome.textContent = "🤫 Bienvenidos a PendejosUnite - nuestro secreto 🇨🇴❤️🇺🇸";
+      welcome.textContent = "🤫 Bienvenidos a PendejosUnite - nuestro secreto";
       messagesDiv.appendChild(welcome);
 
       snapshot.forEach((doc) => {
         const msg = doc.data();
-        renderMessage(msg, messagesDiv);
+        renderMessage(msg, doc.id, messagesDiv);
       });
 
       scrollChatToBottom();
     }, (error) => {
       console.error("Chat error:", error);
-      // Show offline message
       messagesDiv.innerHTML = '<div class="system-message">⚠️ Chat offline - check Firebase config</div>';
     });
 }
 
-function renderMessage(msg, container) {
+function renderMessage(msg, docId, container) {
   const div = document.createElement("div");
   const senderClass = msg.sender === "Jack" ? "jack" : "lucy";
   div.className = `message ${senderClass}`;
@@ -254,9 +182,12 @@ function renderMessage(msg, container) {
   }) : "...";
 
   div.innerHTML = `
-    <div class="msg-sender">${msg.sender} ${msg.sender === "Jack" ? "🇺🇸" : "🇨🇴"}</div>
+    <div class="msg-sender">${escapeHtml(msg.sender)}</div>
     <div class="msg-text">${escapeHtml(msg.text)}</div>
-    <div class="msg-time">${time}</div>
+    <div class="msg-bottom">
+      <button class="pin-btn" onclick="pinMessage('${docId}')" title="Pin this message">📌</button>
+      <span class="msg-time">${time}</span>
+    </div>
   `;
 
   container.appendChild(div);
@@ -299,15 +230,37 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
+// --- Pin a chat message to the pinboard ---
+async function pinMessage(msgDocId) {
+  try {
+    const msgDoc = await db.collection("messages").doc(msgDocId).get();
+    if (!msgDoc.exists) return;
+
+    const msg = msgDoc.data();
+
+    await db.collection("pins").add({
+      text: msg.text,
+      sender: msg.sender,
+      pinnedBy: currentUser,
+      type: "chat",
+      imageUrl: null,
+      originalTimestamp: msg.timestamp,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    // Quick visual feedback - switch to pinboard
+    switchTab("pinboard");
+  } catch (error) {
+    console.error("Pin error:", error);
+    alert("Error pinning message");
+  }
+}
+
 // --- Online Presence ---
 function initPresence() {
-  // Update our presence immediately
   updatePresence();
-
-  // Keep updating every 30 seconds
   presenceInterval = setInterval(updatePresence, 30000);
 
-  // Listen for partner's presence
   if (unsubscribePresence) unsubscribePresence();
 
   unsubscribePresence = db.collection("presence").doc(getPartner())
@@ -320,11 +273,11 @@ function initPresence() {
         const lastSeen = data.lastSeen?.toDate();
         const now = new Date();
         const diffMs = now - lastSeen;
-        const isOnline = diffMs < 60000; // Online if seen in last 60 seconds
+        const isOnline = diffMs < 60000;
 
         if (isOnline) {
           dot.className = "status-dot online";
-          statusText.textContent = "online 🟢";
+          statusText.textContent = "online";
         } else {
           dot.className = "status-dot offline";
           const mins = Math.floor(diffMs / 60000);
@@ -344,14 +297,12 @@ function initPresence() {
       console.error("Presence error:", error);
     });
 
-  // Update presence on visibility change
   document.addEventListener("visibilitychange", () => {
     if (document.visibilityState === "visible") {
       updatePresence();
     }
   });
 
-  // Set offline on page close
   window.addEventListener("beforeunload", setOffline);
 }
 
@@ -366,7 +317,6 @@ function updatePresence() {
 }
 
 function setOffline() {
-  // Use sendBeacon-friendly approach
   db.collection("presence").doc(currentUser).update({
     online: false,
     lastSeen: firebase.firestore.FieldValue.serverTimestamp()
@@ -455,7 +405,6 @@ async function uploadMedia() {
     try {
       progressText.textContent = `Subiendo ${i + 1}/${selectedFiles.length}...`;
 
-      // Upload file
       const uploadTask = storageRef.put(file);
 
       await new Promise((resolve, reject) => {
@@ -469,15 +418,12 @@ async function uploadMedia() {
         );
       });
 
-      // Get download URL
       const downloadURL = await storageRef.getDownloadURL();
 
-      // Determine media type
       let mediaType = "image";
       if (file.type.startsWith("video/")) mediaType = "video";
       if (file.type.startsWith("audio/")) mediaType = "audio";
 
-      // Save to Firestore
       await db.collection("media").add({
         url: downloadURL,
         type: mediaType,
@@ -493,7 +439,6 @@ async function uploadMedia() {
     }
   }
 
-  // Reset
   progressDiv.classList.add("hidden");
   progressFill.style.width = "0%";
   document.querySelector(".upload-btn").disabled = false;
@@ -524,7 +469,7 @@ function renderMediaPost(post, docId, container) {
 
   div.innerHTML = `
     <div class="media-post-header">
-      <span class="media-post-user">${post.sender} ${post.sender === "Jack" ? "🇺🇸" : "🇨🇴"}</span>
+      <span class="media-post-user">${escapeHtml(post.sender)}</span>
       <div>
         <span class="media-post-time">${time}</span>
         <button class="media-post-delete" onclick="deleteMedia('${docId}', '${post.fileName}')">🗑️</button>
@@ -584,34 +529,144 @@ function initDragDrop() {
   });
 }
 
-// --- Fun Zone ---
-function initFunZone() {
-  getNewJoke();
-  newSpanishTip();
-  newEnglishTip();
-  newPrompt();
+// --- Pinboard ---
+function initPinboard() {
+  if (unsubscribePins) unsubscribePins();
+
+  unsubscribePins = db.collection("pins")
+    .orderBy("timestamp", "desc")
+    .limit(100)
+    .onSnapshot((snapshot) => {
+      const grid = document.getElementById("pinboard-grid");
+      grid.innerHTML = "";
+
+      if (snapshot.empty) {
+        grid.innerHTML = `
+          <div class="pinboard-empty" style="grid-column: 1 / -1;">
+            <span>📌</span>
+            <p>Nothing pinned yet!</p>
+            <p>Pin messages from chat or add photos and notes here.</p>
+          </div>
+        `;
+        return;
+      }
+
+      snapshot.forEach((doc) => {
+        const pin = doc.data();
+        renderPinCard(pin, doc.id, grid);
+      });
+    }, (error) => {
+      console.error("Pinboard error:", error);
+    });
 }
 
-function getNewJoke() {
-  const joke = JOKES[Math.floor(Math.random() * JOKES.length)];
-  document.getElementById("joke-text").textContent = joke;
+function renderPinCard(pin, docId, container) {
+  const div = document.createElement("div");
+  div.className = "pin-card";
+
+  const time = pin.timestamp ? new Date(pin.timestamp.toDate()).toLocaleDateString("es-CO", {
+    day: "numeric",
+    month: "short",
+    year: "numeric"
+  }) : "...";
+
+  const typeLabel = pin.type === "chat" ? "from chat" : "pinned";
+  const typeClass = pin.type === "chat" ? "from-chat" : "from-pinboard";
+
+  let imageHtml = "";
+  if (pin.imageUrl) {
+    imageHtml = `<img class="pin-card-image" src="${pin.imageUrl}" alt="" onclick="openLightbox('${pin.imageUrl}')" loading="lazy">`;
+  }
+
+  let textHtml = "";
+  if (pin.text) {
+    textHtml = `<div class="pin-card-text">${escapeHtml(pin.text)}</div>`;
+  }
+
+  div.innerHTML = `
+    <button class="pin-card-delete" onclick="deletePin('${docId}')">🗑️</button>
+    ${imageHtml}
+    <div class="pin-card-body">
+      ${textHtml}
+      <div class="pin-card-meta">
+        <span class="pin-card-sender">${escapeHtml(pin.pinnedBy || pin.sender || "?")}</span>
+        <span class="pin-card-type ${typeClass}">${typeLabel}</span>
+        <span>${time}</span>
+      </div>
+    </div>
+  `;
+
+  container.appendChild(div);
 }
 
-function newSpanishTip() {
-  const tip = SPANISH_TIPS[Math.floor(Math.random() * SPANISH_TIPS.length)];
-  document.getElementById("spanish-word").textContent = tip.word;
-  document.getElementById("spanish-meaning").textContent = tip.meaning;
+// Handle pin photo file select
+function handlePinFileSelect(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  pinSelectedFile = file;
+  const preview = document.getElementById("pin-photo-preview");
+  const img = document.getElementById("pin-preview-img");
+  img.src = URL.createObjectURL(file);
+  preview.classList.remove("hidden");
 }
 
-function newEnglishTip() {
-  const tip = ENGLISH_TIPS[Math.floor(Math.random() * ENGLISH_TIPS.length)];
-  document.getElementById("english-word").textContent = tip.word;
-  document.getElementById("english-meaning").textContent = tip.meaning;
+function removePinPreview() {
+  pinSelectedFile = null;
+  document.getElementById("pin-photo-preview").classList.add("hidden");
+  document.getElementById("pin-file-input").value = "";
 }
 
-function newPrompt() {
-  const prompt = PROMPTS[Math.floor(Math.random() * PROMPTS.length)];
-  document.getElementById("conversation-prompt").textContent = prompt;
+async function submitPin() {
+  const textInput = document.getElementById("pin-text-input");
+  const text = textInput.value.trim();
+
+  if (!text && !pinSelectedFile) return;
+
+  let imageUrl = null;
+
+  // Upload photo if selected
+  if (pinSelectedFile) {
+    try {
+      const fileName = `pins/${Date.now()}_${pinSelectedFile.name}`;
+      const storageRef = storage.ref(fileName);
+      await storageRef.put(pinSelectedFile);
+      imageUrl = await storageRef.getDownloadURL();
+    } catch (error) {
+      console.error("Pin upload error:", error);
+      alert("Error uploading photo");
+      return;
+    }
+  }
+
+  try {
+    await db.collection("pins").add({
+      text: text || null,
+      sender: currentUser,
+      pinnedBy: currentUser,
+      type: "pinboard",
+      imageUrl: imageUrl,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    // Reset
+    textInput.value = "";
+    removePinPreview();
+  } catch (error) {
+    console.error("Pin submit error:", error);
+    alert("Error creating pin");
+  }
+}
+
+async function deletePin(docId) {
+  if (!confirm("Remove this pin? 📌")) return;
+
+  try {
+    await db.collection("pins").doc(docId).delete();
+  } catch (error) {
+    console.error("Delete pin error:", error);
+    alert("Error deleting pin");
+  }
 }
 
 // --- Password input enter key ---
@@ -623,6 +678,5 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Check if already authenticated
   checkAuth();
 });

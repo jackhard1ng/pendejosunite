@@ -1,6 +1,5 @@
 /* ============================================
    PendejosUnite - Secret Hangout Spot
-   Colors: Vibrant blues, greens, Colombian gold
    ============================================ */
 
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
@@ -22,11 +21,6 @@
   --bg-input: #0f3460;
   --text-light: #e8e8e8;
   --text-muted: #a0a0b0;
-  --colombian-yellow: #FCD116;
-  --colombian-blue: #003893;
-  --colombian-red: #CE1126;
-  --us-blue: #3C3B6E;
-  --us-red: #B22234;
   --gradient-fun: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   --gradient-chat: linear-gradient(135deg, #00b4d8, #06d6a0);
   --shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
@@ -43,6 +37,70 @@ body {
 
 .hidden {
   display: none !important;
+}
+
+/* ============================================
+   BACKGROUND PHOTOS - scattered fun polaroid style
+   ============================================ */
+
+.bg-photos {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.bg-photo {
+  position: absolute;
+  width: 280px;
+  height: auto;
+  border-radius: 12px;
+  opacity: 0.12;
+  border: 4px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  transition: opacity 0.5s;
+  object-fit: cover;
+}
+
+/* Scattered positions with fun rotations */
+.bg-photo-1 {
+  top: 5%;
+  left: -3%;
+  transform: rotate(-12deg);
+  animation: floatPhoto1 20s ease-in-out infinite;
+}
+
+.bg-photo-2 {
+  top: 40%;
+  right: -5%;
+  transform: rotate(8deg);
+  animation: floatPhoto2 25s ease-in-out infinite;
+}
+
+.bg-photo-3 {
+  bottom: 3%;
+  left: 25%;
+  transform: rotate(-5deg);
+  animation: floatPhoto3 22s ease-in-out infinite;
+}
+
+@keyframes floatPhoto1 {
+  0%, 100% { transform: rotate(-12deg) translate(0, 0); }
+  50% { transform: rotate(-10deg) translate(15px, 20px); }
+}
+
+@keyframes floatPhoto2 {
+  0%, 100% { transform: rotate(8deg) translate(0, 0); }
+  50% { transform: rotate(10deg) translate(-20px, 15px); }
+}
+
+@keyframes floatPhoto3 {
+  0%, 100% { transform: rotate(-5deg) translate(0, 0); }
+  50% { transform: rotate(-3deg) translate(10px, -15px); }
 }
 
 /* ============================================
@@ -63,10 +121,14 @@ body {
   align-items: center;
   min-height: 100vh;
   padding: 20px;
+  position: relative;
+  z-index: 1;
 }
 
 .login-card {
-  background: var(--bg-card);
+  background: rgba(22, 33, 62, 0.92);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-radius: 24px;
   padding: 50px 40px;
   text-align: center;
@@ -179,23 +241,6 @@ body {
   animation: shake 0.5s ease-in-out;
 }
 
-.login-flags {
-  margin-top: 30px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-}
-
-.flag {
-  font-size: 2.5rem;
-}
-
-.flag-heart {
-  font-size: 1.5rem;
-  animation: pulse 1.5s infinite;
-}
-
 /* ============================================
    TOP NAVIGATION
    ============================================ */
@@ -205,7 +250,9 @@ body {
   align-items: center;
   justify-content: space-between;
   padding: 12px 24px;
-  background: var(--bg-card);
+  background: rgba(22, 33, 62, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-bottom: 2px solid rgba(0, 180, 216, 0.2);
   position: sticky;
   top: 0;
@@ -328,6 +375,8 @@ body {
 
 .tab-content {
   padding: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .tab-content.active {
@@ -369,6 +418,7 @@ body {
   border-radius: 18px;
   animation: fadeInUp 0.3s ease-out;
   word-wrap: break-word;
+  position: relative;
 }
 
 .message.jack {
@@ -395,11 +445,33 @@ body {
   line-height: 1.4;
 }
 
+.message .msg-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 6px;
+}
+
 .message .msg-time {
   font-size: 0.7rem;
   opacity: 0.6;
-  margin-top: 6px;
-  text-align: right;
+}
+
+.message .pin-btn {
+  font-size: 0.7rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 0.4;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.message .pin-btn:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.15);
 }
 
 .chat-input-area {
@@ -407,7 +479,8 @@ body {
   align-items: center;
   gap: 10px;
   padding: 16px 20px;
-  background: var(--bg-card);
+  background: rgba(22, 33, 62, 0.95);
+  backdrop-filter: blur(10px);
   border-top: 1px solid rgba(0, 180, 216, 0.15);
 }
 
@@ -512,7 +585,8 @@ body {
 }
 
 .media-upload-area {
-  background: var(--bg-card);
+  background: rgba(22, 33, 62, 0.92);
+  backdrop-filter: blur(10px);
   border-radius: 20px;
   padding: 30px;
   margin-bottom: 30px;
@@ -646,7 +720,8 @@ body {
 }
 
 .media-post {
-  background: var(--bg-card);
+  background: rgba(22, 33, 62, 0.92);
+  backdrop-filter: blur(10px);
   border-radius: 20px;
   overflow: hidden;
   border: 1px solid rgba(0, 180, 216, 0.1);
@@ -714,192 +789,237 @@ body {
 }
 
 /* ============================================
-   FUN ZONE
+   PINBOARD SECTION
    ============================================ */
 
-.fun-container {
+.pinboard-container {
   padding: 24px;
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
 }
 
-.fun-card {
-  background: var(--bg-card);
-  border-radius: 20px;
-  padding: 28px;
+.pinboard-title {
+  font-weight: 800;
+  font-size: 1.5rem;
+  text-align: center;
+  margin-bottom: 4px;
+}
+
+.pinboard-subtitle {
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 24px;
+}
+
+/* Pin upload area */
+.pin-upload-area {
+  background: rgba(22, 33, 62, 0.92);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 20px;
+  margin-bottom: 28px;
   border: 1px solid rgba(0, 180, 216, 0.15);
 }
 
-.fun-card h2 {
-  margin-bottom: 18px;
-  font-weight: 700;
-  font-size: 1.2rem;
+.pin-upload-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
 }
 
-.joke-display {
-  text-align: center;
+#pin-text-input {
+  flex: 1;
+  padding: 12px 18px;
+  border-radius: 12px;
+  border: 2px solid rgba(0, 180, 216, 0.2);
+  background: var(--bg-input);
+  color: var(--text-light);
+  font-family: 'Nunito', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.3s;
 }
 
-#joke-text {
-  font-size: 1.1rem;
-  line-height: 1.6;
-  margin-bottom: 18px;
-  color: var(--accent);
-  font-style: italic;
+#pin-text-input:focus {
+  border-color: var(--primary);
 }
 
-.new-joke-btn,
-.fun-card button {
-  padding: 10px 22px;
+#pin-text-input::placeholder {
+  color: var(--text-muted);
+}
+
+.pin-upload-photo-btn {
+  padding: 10px 16px;
   border-radius: 12px;
   border: none;
   background: var(--gradient-fun);
   color: white;
   font-family: 'Nunito', sans-serif;
   font-weight: 700;
+  font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.3s;
-  font-size: 0.9rem;
+  white-space: nowrap;
 }
 
-.fun-card button:hover {
+.pin-upload-photo-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
 }
 
-.language-tips {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
-.tip-card {
-  background: var(--bg-input);
-  border-radius: 14px;
-  padding: 20px;
-  text-align: center;
-}
-
-.tip-card h3 {
-  font-size: 0.95rem;
-  margin-bottom: 14px;
+.pin-submit-btn {
+  padding: 10px 20px;
+  border-radius: 12px;
+  border: none;
+  background: var(--gradient-chat);
+  color: white;
+  font-family: 'Nunito', sans-serif;
   font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  white-space: nowrap;
 }
 
-.tip-word {
-  font-size: 1.5rem;
-  font-weight: 800;
-  margin-bottom: 6px;
+.pin-submit-btn:hover {
+  transform: translateY(-2px);
 }
 
-.spanish-tip .tip-word {
-  color: var(--colombian-yellow);
+.pin-photo-preview {
+  margin-top: 12px;
+  position: relative;
+  display: inline-block;
 }
 
-.english-tip .tip-word {
-  color: var(--primary);
+.pin-photo-preview img {
+  max-width: 200px;
+  max-height: 150px;
+  border-radius: 10px;
+  border: 2px solid rgba(0, 180, 216, 0.3);
 }
 
-.tip-meaning {
-  font-size: 0.9rem;
-  color: var(--text-muted);
-  margin-bottom: 14px;
-}
-
-.tip-card button {
+.pin-remove-preview {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  border: none;
+  background: var(--danger);
+  color: white;
   font-size: 0.8rem;
-  padding: 8px 16px;
-}
-
-.conversation-prompt {
-  font-size: 1.15rem;
-  text-align: center;
-  color: var(--secondary);
-  font-weight: 600;
-  margin-bottom: 18px;
-  line-height: 1.5;
-}
-
-.prompt-display {
-  text-align: center;
-}
-
-/* Our Photos Grid */
-.our-photos-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.photo-placeholder {
-  aspect-ratio: 1;
-  background: var(--bg-input);
-  border-radius: 14px;
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--text-muted);
-  font-size: 0.9rem;
-  border: 2px dashed rgba(0, 180, 216, 0.2);
 }
 
-.our-photos-grid img {
-  width: 100%;
-  aspect-ratio: 1;
-  object-fit: cover;
-  border-radius: 14px;
-  border: 2px solid rgba(0, 180, 216, 0.2);
+/* Pinboard grid - masonry-like staggered */
+.pinboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 18px;
+}
+
+.pin-card {
+  background: rgba(22, 33, 62, 0.92);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 180, 216, 0.15);
+  animation: fadeInUp 0.4s ease-out;
   transition: transform 0.3s;
+  position: relative;
 }
 
-.our-photos-grid img:hover {
-  transform: scale(1.02);
+.pin-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-glow);
 }
 
-.photos-note {
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 0.85rem;
-  font-style: italic;
+.pin-card-image {
+  width: 100%;
+  max-height: 300px;
+  object-fit: cover;
+  display: block;
+  cursor: pointer;
 }
 
-.photos-card h2 {
-  text-align: center;
+.pin-card-body {
+  padding: 16px;
 }
 
-/* ============================================
-   TYPING INDICATOR
-   ============================================ */
+.pin-card-text {
+  font-size: 1rem;
+  line-height: 1.5;
+  margin-bottom: 10px;
+}
 
-.typing-indicator {
-  align-self: flex-start;
-  padding: 12px 18px;
-  background: rgba(6, 214, 160, 0.2);
-  border-radius: 18px;
-  border-bottom-left-radius: 4px;
+.pin-card-meta {
   display: flex;
   align-items: center;
-  gap: 4px;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-muted);
 }
 
-.typing-indicator span {
-  width: 8px;
-  height: 8px;
-  background: var(--secondary);
-  border-radius: 50%;
-  animation: typingBounce 1.4s infinite;
+.pin-card-sender {
+  font-weight: 700;
+  color: var(--primary);
 }
 
-.typing-indicator span:nth-child(2) { animation-delay: 0.2s; }
-.typing-indicator span:nth-child(3) { animation-delay: 0.4s; }
+.pin-card-type {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
 
-@keyframes typingBounce {
-  0%, 60%, 100% { transform: translateY(0); }
-  30% { transform: translateY(-8px); }
+.pin-card-type.from-chat {
+  background: rgba(0, 180, 216, 0.15);
+  color: var(--primary);
+}
+
+.pin-card-type.from-pinboard {
+  background: rgba(102, 126, 234, 0.15);
+  color: #667eea;
+}
+
+.pin-card-delete {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 8px;
+  border: none;
+  background: rgba(0, 0, 0, 0.6);
+  color: var(--danger);
+  border-radius: 8px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.pin-card:hover .pin-card-delete {
+  opacity: 1;
+}
+
+.pin-card-delete:hover {
+  background: rgba(239, 71, 111, 0.4);
+}
+
+.pinboard-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+}
+
+.pinboard-empty span {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 12px;
 }
 
 /* ============================================
@@ -1005,12 +1125,8 @@ body {
   }
 
   .media-container,
-  .fun-container {
+  .pinboard-container {
     padding: 16px;
-  }
-
-  .language-tips {
-    grid-template-columns: 1fr;
   }
 
   .upload-zone {
@@ -1024,6 +1140,23 @@ body {
   .emoji-grid {
     grid-template-columns: repeat(6, 1fr);
   }
+
+  .bg-photo {
+    width: 180px;
+    opacity: 0.08;
+  }
+
+  .pin-upload-row {
+    flex-direction: column;
+  }
+
+  #pin-text-input {
+    width: 100%;
+  }
+
+  .pinboard-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 @media (max-width: 400px) {
@@ -1032,7 +1165,7 @@ body {
     font-size: 0.75rem;
   }
 
-  .our-photos-grid {
+  .pinboard-grid {
     grid-template-columns: 1fr;
   }
 }

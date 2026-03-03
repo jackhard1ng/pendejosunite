@@ -1,17 +1,15 @@
 // ============================================
-// Firebase Configuration
+// Firebase Configuration - PendejosUnite
 // ============================================
-// INSTRUCTIONS: Replace these placeholder values with your actual Firebase project config.
-// Go to Firebase Console > Project Settings > General > Your apps > Web app
-// Copy the config object and paste the values below.
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY_HERE",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.firebasestorage.app",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyBlVUrtOoaLvRB5avQoofrm2efDjXMppo4",
+  authDomain: "lucy-c8e33.firebaseapp.com",
+  projectId: "lucy-c8e33",
+  storageBucket: "lucy-c8e33.firebasestorage.app",
+  messagingSenderId: "1033897212842",
+  appId: "1:1033897212842:web:689e1f0138181fd87549d3",
+  measurementId: "G-GTWY1Y1XT6"
 };
 
 // Initialize Firebase

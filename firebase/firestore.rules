@@ -1,27 +1,28 @@
 rules_version = '2';
 
-// PendejosUnite - Firestore Security Rules
-// These rules allow read/write access only from your domain.
-// Since the site is password-protected on the frontend,
-// and we want to keep it simple, we lock it to your domain.
+// PendejosUnite - Firestore Security Rules (Production)
+// These rules allow read/write only on the specific collections we use.
 
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    // Chat messages - read and write
+    // Chat messages
     match /messages/{messageId} {
       allow read, write: if true;
-      // For extra security, you can restrict to your domain:
-      // allow read, write: if request.auth != null;
     }
 
-    // Media posts - read and write
+    // Media posts
     match /media/{mediaId} {
       allow read, write: if true;
     }
 
-    // Presence/online status - read and write
+    // Presence/online status
     match /presence/{userId} {
+      allow read, write: if true;
+    }
+
+    // Pinboard
+    match /pins/{pinId} {
       allow read, write: if true;
     }
 

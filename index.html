@@ -8,6 +8,14 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤫</text></svg>">
 </head>
 <body class="login-body">
+
+  <!-- Background Photos (visible everywhere, fun scattered look) -->
+  <div class="bg-photos" id="bg-photos">
+    <img src="photos/foto1.jpg" alt="" class="bg-photo bg-photo-1">
+    <img src="photos/foto2.jpg" alt="" class="bg-photo bg-photo-2">
+    <img src="photos/foto3.jpg" alt="" class="bg-photo bg-photo-3">
+  </div>
+
   <!-- Login Screen -->
   <div id="login-screen" class="login-container">
     <div class="login-card">
@@ -18,11 +26,6 @@
         <input type="password" id="password-input" placeholder="Contraseña secreta..." autocomplete="off">
         <button id="login-btn" onclick="attemptLogin()">Entrar 🚪</button>
         <p id="login-error" class="login-error hidden">¡Esa no es, pendejo/a! 😜 Intenta otra vez.</p>
-      </div>
-      <div class="login-flags">
-        <span class="flag">🇨🇴</span>
-        <span class="flag-heart">❤️</span>
-        <span class="flag">🇺🇸</span>
       </div>
     </div>
   </div>
@@ -37,14 +40,14 @@
       <div class="nav-center">
         <button class="nav-tab active" data-tab="chat" onclick="switchTab('chat')">💬 Chat</button>
         <button class="nav-tab" data-tab="media" onclick="switchTab('media')">📸 Fotos y Más</button>
-        <button class="nav-tab" data-tab="fun" onclick="switchTab('fun')">🎉 Fun Zone</button>
+        <button class="nav-tab" data-tab="pinboard" onclick="switchTab('pinboard')">📌 Pinboard</button>
       </div>
       <div class="nav-right">
         <div class="online-status-container">
           <div id="user-status-indicator" class="status-dot online"></div>
           <select id="user-select" onchange="setCurrentUser()">
-            <option value="Jack">Jack 🇺🇸</option>
-            <option value="Lucy">Lucy 🇨🇴</option>
+            <option value="Jack">Jack</option>
+            <option value="Lucy">Lucy</option>
           </select>
         </div>
         <div class="partner-status">
@@ -107,60 +110,29 @@
       </div>
     </section>
 
-    <!-- Fun Zone Section -->
-    <section id="fun-section" class="tab-content hidden">
-      <div class="fun-container">
-        <!-- Joke of the Day -->
-        <div class="fun-card">
-          <h2>😂 Chiste del Día / Joke of the Day</h2>
-          <div id="joke-display" class="joke-display">
-            <p id="joke-text">Loading...</p>
-            <button class="new-joke-btn" onclick="getNewJoke()">Otro chiste 🎲</button>
+    <!-- Pinboard Section -->
+    <section id="pinboard-section" class="tab-content hidden">
+      <div class="pinboard-container">
+        <h2 class="pinboard-title">📌 Our Pinboard</h2>
+        <p class="pinboard-subtitle">Pin messages from chat or upload photos to keep here forever</p>
+
+        <!-- Pin upload area -->
+        <div class="pin-upload-area">
+          <div class="pin-upload-row">
+            <input type="text" id="pin-text-input" placeholder="Write something to pin... 📝">
+            <button class="pin-upload-photo-btn" onclick="document.getElementById('pin-file-input').click()">📷 Add photo</button>
+            <input type="file" id="pin-file-input" accept="image/*" hidden onchange="handlePinFileSelect(event)">
+            <button class="pin-submit-btn" onclick="submitPin()">📌 Pin it!</button>
+          </div>
+          <div id="pin-photo-preview" class="pin-photo-preview hidden">
+            <img id="pin-preview-img" src="" alt="preview">
+            <button class="pin-remove-preview" onclick="removePinPreview()">✕</button>
           </div>
         </div>
 
-        <!-- Language Tips -->
-        <div class="fun-card">
-          <h2>📚 Language Exchange Corner</h2>
-          <div class="language-tips">
-            <div class="tip-card spanish-tip">
-              <h3>🇨🇴 Lucy teaches Jack Spanish</h3>
-              <div id="spanish-tip" class="tip-content">
-                <p class="tip-word" id="spanish-word">Loading...</p>
-                <p class="tip-meaning" id="spanish-meaning"></p>
-              </div>
-              <button onclick="newSpanishTip()">Next tip 🔄</button>
-            </div>
-            <div class="tip-card english-tip">
-              <h3>🇺🇸 Jack teaches Lucy English</h3>
-              <div id="english-tip" class="tip-content">
-                <p class="tip-word" id="english-word">Loading...</p>
-                <p class="tip-meaning" id="english-meaning"></p>
-              </div>
-              <button onclick="newEnglishTip()">Next tip 🔄</button>
-            </div>
-          </div>
-        </div>
-
-        <!-- Quick Prompts -->
-        <div class="fun-card">
-          <h2>💡 Random Prompts para conversar</h2>
-          <div class="prompt-display">
-            <p id="conversation-prompt" class="conversation-prompt">Loading...</p>
-            <button onclick="newPrompt()">Otro prompt 🎰</button>
-          </div>
-        </div>
-
-        <!-- Photo Placeholder -->
-        <div class="fun-card photos-card">
-          <h2>📷 Nuestras Fotos</h2>
-          <div id="our-photos" class="our-photos-grid">
-            <div class="photo-placeholder">📷 Foto 1 coming soon...</div>
-            <div class="photo-placeholder">📷 Foto 2 coming soon...</div>
-            <div class="photo-placeholder">📷 Foto 3 coming soon...</div>
-            <div class="photo-placeholder">📷 Foto 4 coming soon...</div>
-          </div>
-          <p class="photos-note">Jack va a subir 4 fotos de nosotros aquí 🥰</p>
+        <!-- Pinboard grid -->
+        <div id="pinboard-grid" class="pinboard-grid">
+          <!-- Pinned items will be inserted here -->
         </div>
       </div>
     </section>
