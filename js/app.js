@@ -23,6 +23,11 @@ let unsubscribeMedia = null;
 let unsubscribePresence = null;
 let unsubscribePins = null;
 let presenceInterval = null;
+let mediaRecorder = null;
+let audioChunks = [];
+let isRecording = false;
+let recordingTimer = null;
+let recordingSeconds = 0;
 
 // --- Authentication ---
 function attemptLogin() {
@@ -181,9 +186,16 @@ function renderMessage(msg, docId, container) {
     minute: "2-digit"
   }) : "...";
 
+  let contentHtml = "";
+  if (msg.audioUrl) {
+    contentHtml = `<div class="msg-audio"><audio src="${msg.audioUrl}" controls preload="metadata"></audio></div>`;
+  } else {
+    contentHtml = `<div class="msg-text">${escapeHtml(msg.text)}</div>`;
+  }
+
   div.innerHTML = `
     <div class="msg-sender">${escapeHtml(msg.sender)}</div>
-    <div class="msg-text">${escapeHtml(msg.text)}</div>
+    ${contentHtml}
     <div class="msg-bottom">
       <button class="pin-btn" onclick="pinMessage('${docId}')" title="Pin this message">📌</button>
       <span class="msg-time">${time}</span>
@@ -666,6 +678,123 @@ async function deletePin(docId) {
   } catch (error) {
     console.error("Delete pin error:", error);
     alert("Error deleting pin");
+  }
+}
+
+// --- Audio Recording ---
+async function toggleRecording() {
+  if (isRecording) {
+    stopRecording();
+  } else {
+    startRecording();
+  }
+}
+
+async function startRecording() {
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
+
+    mediaRecorder.ondataavailable = (e) => {
+      if (e.data.size > 0) audioChunks.push(e.data);
+    };
+
+    mediaRecorder.onstop = async () => {
+      stream.getTracks().forEach(track => track.stop());
+
+      if (audioChunks.length === 0) return;
+
+      const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+      await uploadAndSendAudio(audioBlob);
+    };
+
+    mediaRecorder.start();
+    isRecording = true;
+    recordingSeconds = 0;
+
+    const micBtn = document.getElementById("mic-btn");
+    micBtn.classList.add("recording");
+    document.getElementById("recording-indicator").classList.remove("hidden");
+    document.getElementById("chat-input").classList.add("hidden");
+    document.querySelector(".send-btn").classList.add("hidden");
+    document.querySelector(".emoji-picker-container").classList.add("hidden");
+
+    recordingTimer = setInterval(() => {
+      recordingSeconds++;
+      const mins = Math.floor(recordingSeconds / 60);
+      const secs = recordingSeconds % 60;
+      document.getElementById("rec-timer").textContent = `${mins}:${secs.toString().padStart(2, "0")}`;
+    }, 1000);
+
+  } catch (error) {
+    console.error("Mic access error:", error);
+    alert("No se pudo acceder al micrófono. Revisa los permisos.");
+  }
+}
+
+function stopRecording() {
+  if (mediaRecorder && mediaRecorder.state !== "inactive") {
+    mediaRecorder.stop();
+  }
+  resetRecordingUI();
+}
+
+function cancelRecording() {
+  if (mediaRecorder && mediaRecorder.state !== "inactive") {
+    mediaRecorder.ondataavailable = null;
+    mediaRecorder.onstop = () => {
+      mediaRecorder.stream.getTracks().forEach(track => track.stop());
+    };
+    mediaRecorder.stop();
+  }
+  audioChunks = [];
+  resetRecordingUI();
+}
+
+function resetRecordingUI() {
+  isRecording = false;
+  if (recordingTimer) clearInterval(recordingTimer);
+  recordingTimer = null;
+  recordingSeconds = 0;
+
+  const micBtn = document.getElementById("mic-btn");
+  micBtn.classList.remove("recording");
+  document.getElementById("recording-indicator").classList.add("hidden");
+  document.getElementById("chat-input").classList.remove("hidden");
+  document.querySelector(".send-btn").classList.remove("hidden");
+  document.querySelector(".emoji-picker-container").classList.remove("hidden");
+  document.getElementById("rec-timer").textContent = "0:00";
+}
+
+async function uploadAndSendAudio(audioBlob) {
+  const fileName = `audio/${Date.now()}_${currentUser}.webm`;
+  const storageRef = storage.ref(fileName);
+
+  try {
+    const micBtn = document.getElementById("mic-btn");
+    micBtn.disabled = true;
+    micBtn.textContent = "...";
+
+    await storageRef.put(audioBlob);
+    const downloadURL = await storageRef.getDownloadURL();
+
+    await db.collection("messages").add({
+      sender: currentUser,
+      text: "",
+      audioUrl: downloadURL,
+      audioFileName: fileName,
+      timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    micBtn.disabled = false;
+    micBtn.textContent = "🎙️";
+  } catch (error) {
+    console.error("Audio upload error:", error);
+    alert("Error subiendo el audio. Intenta de nuevo.");
+    const micBtn = document.getElementById("mic-btn");
+    micBtn.disabled = false;
+    micBtn.textContent = "🎙️";
   }
 }
 

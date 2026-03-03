@@ -76,6 +76,12 @@
           </div>
           <input type="text" id="chat-input" placeholder="Escribe algo, pendejo/a... 😜" onkeypress="handleChatKeypress(event)">
           <button class="send-btn" onclick="sendMessage()">Enviar 🚀</button>
+          <button class="mic-btn" id="mic-btn" onclick="toggleRecording()">🎙️</button>
+          <div id="recording-indicator" class="recording-indicator hidden">
+            <div class="rec-dot"></div>
+            <span id="rec-timer">0:00</span>
+            <button class="rec-cancel" onclick="cancelRecording()">✕</button>
+          </div>
         </div>
       </div>
     </section>
